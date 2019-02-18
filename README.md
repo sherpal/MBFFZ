@@ -36,7 +36,7 @@ The last player alive wins the game.
 
 In order to play, you'll need to
 
-- clone this repository (`git clone ???`)
+- clone this repository (`git clone https://github.com/sherpal/MBFFZ`)
 - [sbt](https://www.scala-sbt.org/)
 - go to sbt, and uses the `fullOptCompileCopy` task
 (this is used to make the frontend JavaScript file
