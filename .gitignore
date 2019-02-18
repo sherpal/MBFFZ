@@ -1,0 +1,13 @@
+
+backend/target
+backend/src/main/resources/frontend/frontend-scala.js
+
+project/target
+project/project/target
+
+frontend/target
+
+target
+
+.DS_Store
+.idea
