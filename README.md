@@ -38,12 +38,12 @@ In order to play, you'll need to
 
 - clone this repository (`git clone https://github.com/sherpal/MBFFZ`)
 - [sbt](https://www.scala-sbt.org/)
-- go to sbt, and uses the `fullOptCompileCopy` task
-(this is used to make the frontend JavaScript file
-using Scala.js, and to copy it in `backend/src/main/resources/frontend`)
 - change the `hostName` in
 `shared/src/main/scala/utils/Constants.scala`
 to your IP address
+- go to sbt, and uses the `fullOptCompileCopy` task
+(this is used to make the frontend JavaScript file
+using Scala.js, and to copy it in `backend/src/main/resources/frontend`)
 - use the `run` sbt task.
 
 
