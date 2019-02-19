@@ -55,8 +55,6 @@
         request.send()
     }
 
-    setInterval(getRemainingColours, 5000)
-
     var form = document.getElementById("join-form")
 
     form.onsubmit = function(event) {

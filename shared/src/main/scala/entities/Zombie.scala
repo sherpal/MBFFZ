@@ -49,7 +49,7 @@ object Zombie {
     })
 
     val remainingAndDeletedZombies = zombies.values
-      .groupBy(zombie => zombie.pos.toIntComplex / 5)
+      .groupBy(zombie => (zombie.pos.re.toInt / 5, zombie.pos.im.toInt / 5))
       .values
       .map(zombiesThere => (zombiesThere.head, zombiesThere.tail))
 
