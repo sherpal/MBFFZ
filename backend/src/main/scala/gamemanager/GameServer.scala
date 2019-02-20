@@ -9,7 +9,6 @@ import routes.websockets.{Client, Server}
 import scala.collection.mutable
 
 final class GameServer extends Server[String] {
-  var j: Int = 0
 
   private val _playersFromPW: mutable.Map[String, Client] = mutable.Map()
 
@@ -54,6 +53,8 @@ final class GameServer extends Server[String] {
           case Some(gameManager) => gameManager.enqueue(gameAction)
           case _ =>
         }
+      case _: Pong =>
+        updateMessageReceived(clientFromChannel(channel))
       case _ =>
         println(message)
     }

@@ -92,4 +92,10 @@ object PreGameManager {
 
   def isPlaying(password: String): Boolean = passwords.isDefinedAt(password)
 
+  def clear(): Unit = {
+    _players.clear()
+    passwords.clear()
+    _headPlayer = None
+  }
+
 }

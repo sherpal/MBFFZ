@@ -4,7 +4,7 @@ import gamestate.actions.GameEnd
 
 object Manager {
 
-  val server: GameServer = new GameServer
+  final val server: GameServer = new GameServer
 
   sealed trait State
   case object PreGameState extends State
@@ -30,6 +30,7 @@ object Manager {
     Manager.setState(Manager.PreGameState)
     _postGameManager = Some(new PostGameManager(gameEnd, orderOfDeaths))
     _gameManager = None
+    PreGameManager.clear()
   }
 
   @inline def postGameManager: Option[PostGameManager] = _postGameManager

@@ -6,7 +6,7 @@ import gamemanager.{Game, Synchronization}
 import gamestate.actions.{GameAction, GameEnd}
 import menus.{MenuDisplay, Menus}
 import messages.Message
-import messages.Message.{ActionList, Pong}
+import messages.Message.{ActionList, Ping, Pong}
 import org.scalajs.dom
 import org.scalajs.dom.raw.WebSocket
 
@@ -19,19 +19,11 @@ final class Communicator private (password: String) {
   val webSocket: WebSocket = new WebSocket(s"ws://${dom.window.location.hostname}:8080/connect/$password")
   webSocket.binaryType = "arraybuffer"
 
-  private var pingIntervalIndex: Option[SetIntervalHandle] = None
-
   webSocket.onopen = (_: dom.Event) => {
     println("WebSocket opened")
     webSocket.send("Hello Server!")
 
     synchronizer.computeLinkTime()
-
-    pingIntervalIndex = Some(
-      setInterval(1000) {
-        webSocket.send("ping")
-      }
-    )
   }
 
   def sendMessage(message: Message): Unit = {
@@ -55,6 +47,7 @@ final class Communicator private (password: String) {
         Game.game.receiveAction(gameAction)
       case ActionList(actions) =>
         Game.game.receiveActions(actions.map(_.asInstanceOf[GameAction]))
+      case Ping(sendingTime) => sendMessage(Pong(sendingTime, new java.util.Date().getTime))
       case _ =>
         println(message)
     }

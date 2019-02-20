@@ -1,6 +1,6 @@
 package gamemanager
 
-import entities.Zombie
+import entities.{PopStationContainer, Zombie}
 import gamestate.actions.{GameAction, GameEnd, PlayerDies, UpdatePlayerPos}
 import gamestate.{ActionCollector, GameState}
 import messages.Message.ActionList
@@ -17,7 +17,9 @@ final class GameManager(playersInfo: Map[String, String], passwords: Map[String,
 
   private val playersFromColours: Map[String, String] = playersInfo.map(_.swap)
 
-  @inline def server: GameServer = Manager.server
+  val nbrOfPlayers: Int = playersInfo.size
+
+  val server: GameServer = Manager.server
 
   private val actionCollector: ActionCollector = new ActionCollector(GameState.emptyGameState())
 
@@ -106,7 +108,9 @@ final class GameManager(playersInfo: Map[String, String], passwords: Map[String,
         val time = new java.util.Date().getTime
 
         val (newPopStations, poppedStations) = gs.popStationContainer.updateZombiePopStations(
-          time, ((time - gs.startTime) / 30000 + 1).toInt, gs.quadtree
+          time, ((time - gs.startTime) / 30000 + nbrOfPlayers).toInt,
+          math.max(2000: Long, PopStationContainer.popTime - ((time - gs.startTime) / 60000) * 2000),
+          gs.quadtree
         )
 
         enqueueActions(List(newPopStations, poppedStations).flatten)

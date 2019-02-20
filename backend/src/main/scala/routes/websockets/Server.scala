@@ -3,6 +3,8 @@ package routes.websockets
 import java.nio.ByteBuffer
 
 import io.undertow.websockets.core._
+import messages.Message
+import messages.Message.Ping
 
 import scala.collection.mutable
 
@@ -15,6 +17,10 @@ trait Server[T] extends AbstractReceiveListener {
   }
 
   private val clients: mutable.Map[WebSocketChannel, Client] = mutable.Map()
+
+  @inline protected def clientFromChannel(channel: WebSocketChannel): Client = clients(channel)
+
+  private val lastMessageReceived: mutable.Map[Client, Long] = mutable.Map()
 
   def sendTextToClient(text: String, client: Client): Unit = {
     sendTextToClient(text, client.channel)
@@ -41,6 +47,7 @@ trait Server[T] extends AbstractReceiveListener {
 
   def clientConnected(client: Client, arg: T): Unit = {
     clients += (client.channel -> client)
+    lastMessageReceived += (client -> new java.util.Date().getTime)
     client.channel.getReceiveSetter.set(this)
     client.channel.resumeReceives()
 
@@ -54,10 +61,55 @@ trait Server[T] extends AbstractReceiveListener {
   def closeCallback(channel: WebSocketChannel, client: Client): Unit
 
   override def onClose(webSocketChannel: WebSocketChannel, channel: StreamSourceFrameChannel): Unit = {
-    println("closed?")
-    val client = clients(webSocketChannel)
-    clients -= webSocketChannel
-    closeCallback(webSocketChannel, client)
+    closingClient(webSocketChannel)
+  }
+
+  private def closingClient(channel: WebSocketChannel): Unit = {
+    println("closed")
+    val client = clients(channel)
+    clients -= channel
+    lastMessageReceived -= client
+    closeCallback(channel, client)
+  }
+
+  def broadcastPing(): Unit = {
+    val time = new java.util.Date().getTime
+    val message = Ping(time)
+    broadcastBytes(() => Message.encode(message))
+  }
+
+  protected def updateMessageReceived(client: Client): Unit =
+    lastMessageReceived += client -> new java.util.Date().getTime
+
+
+  private lazy val checkConnectionsThread: Thread = new Thread {
+
+    override def run(): Unit = {
+      broadcastPing()
+      Thread.sleep(2000)
+      broadcastPing()
+      Thread.sleep(2000)
+
+      val time = new java.util.Date().getTime
+      for {
+        (channel, client) <- clients
+        if time - lastMessageReceived(client) > 5000
+      } {
+        println("killing someone")
+        closingClient(channel)
+        channel.close()
+      }
+      run()
+    }
+  }
+
+  def startCheckConnection(): Unit =
+    checkConnectionsThread.start()
+
+  startCheckConnection()
+
+  def killAll(): Unit = {
+    for ((channel, _) <- clients) channel.close()
   }
 
 }

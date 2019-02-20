@@ -11,12 +11,13 @@ import scala.util.Random
 final class PopStationContainer(
                                  val time: Long,
                                  val popStations: Map[Long, ZombiePopStation],
-                                 val lastPop: Long
+                                 val lastPop: Long,
                                ) {
 
   def updateZombiePopStations(
                                currentTime: Long,
                                numberToPop: Int,
+                               popTime: Long,
                                quadTree: ShapeQT
                              ): (Option[NewPopStations], Option[PopStationsPop]) = {
 
@@ -30,7 +31,7 @@ final class PopStationContainer(
       else tryPos
     }
 
-    val newPopStations = if (currentTime - lastPop > PopStationContainer.popTime)
+    val newPopStations = if (currentTime - lastPop > popTime)
       (0 until numberToPop).toList.map(_ => new ZombiePopStation(
         Entity.newId(), currentTime, findPos()
       ))
@@ -73,8 +74,8 @@ final class PopStationContainer(
 
 object PopStationContainer {
 
-  val gestation: Long = 2000
+  final val gestation: Long = 2000
 
-  val popTime: Long = 10000
+  final val popTime: Long = 10000
 
 }

@@ -27,10 +27,10 @@ final class Player(
 
 object Player {
 
-  val playerRadius: Double = 5
-  val playerSpeed: Double = 100
+  final val playerRadius: Double = 5
+  final val playerSpeed: Double = 100
 
-  val shape: Circle = new Circle(playerRadius)
+  final val shape: Circle = new Circle(playerRadius)
 
   import Complex.i
   private val zero: Complex = 0
