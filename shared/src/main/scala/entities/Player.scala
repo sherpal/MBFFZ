@@ -109,7 +109,9 @@ object Player {
     "Fuchsia" -> Colour(255, 0, 255),
     "Orange" -> Colour(255, 153, 0),
     "Aqua" -> Colour(0, 255, 255),
-    "Light Blue" -> Colour(51, 153, 255)
+    "Light Blue" -> Colour(51, 153, 255),
+    "Light Green" -> Colour(204, 255, 153),
+    "Brown" -> Colour(153, 102, 0)
   ).mapValues(_.cssString)
 
   @inline def cssColour(colourName: String): String = playerColours(colourName)
