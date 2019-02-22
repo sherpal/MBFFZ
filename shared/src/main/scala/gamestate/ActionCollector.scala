@@ -1,7 +1,6 @@
 package gamestate
 
-import gamestate.actions.GameAction
-
+import gamestate.actions.{GameAction, UpdatePlayerPos}
 import exceptions.TooOldActionException
 
 /**
@@ -31,8 +30,6 @@ final class ActionCollector(
   private var actionsAndStates: List[(GameState, List[GameAction])] = List((originalGameState, Nil))
 
   def backupState(n: Int): (GameState, List[GameAction]) = actionsAndStates(n)
-
-  def printStates(): Unit = actionsAndStates.foreach({ case (gs, actions) => println(gs.time, actions.length) })
 
   // TODO: add all actions that share the same time all together.
   def addActions(actions: Traversable[GameAction]): Unit = {
@@ -186,7 +183,6 @@ final class ActionCollector(
           println("coucou")
           println("gs time " + actionsAndStates.head._1.time)
           println("action time " + action.time)
-          println(actionsAndStates)
           throw e
       }
 
@@ -205,7 +201,6 @@ final class ActionCollector(
       gs(actions.takeWhile(_.time <= time))
     case None =>
       println(time)
-      actionsAndStates.map(_._1).map(_.time).foreach(println)
       throw new TooOldActionException(time)
   }
 
@@ -223,7 +218,7 @@ final class ActionCollector(
       _currentGameState = actionsAndStates.head._1(actionsAndStates.head._2)
     } catch {
       case e: Throwable =>
-        println(actionsAndStates.head._2.mkString("\n"))
+        println(actionsAndStates.head._2.filterNot(_.isInstanceOf[UpdatePlayerPos]).mkString("\n"))
         throw e
     }
   }

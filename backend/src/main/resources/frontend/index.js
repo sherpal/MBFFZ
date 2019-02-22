@@ -28,7 +28,6 @@
                 window.location.href = redirect
             }
             if (this.readyState == 4 && this.status == 400) {
-                println(request.responseText)
                 getRemainingColours()
                 alert(request.responseText)
             }
@@ -47,7 +46,6 @@
 
         request.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                println(this.responseText)
                 select.innerHTML = this.responseText
             }
         }

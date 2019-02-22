@@ -52,7 +52,7 @@ final class GameManager(playersInfo: Map[String, String], passwords: Map[String,
       case updatePlayerPos: UpdatePlayerPos =>
         println(s"Player ${updatePlayerPos.playerId} is dead.")
       case _ =>
-        println("should not happen")
+        // should not happen
     }
   }
 
@@ -109,7 +109,7 @@ final class GameManager(playersInfo: Map[String, String], passwords: Map[String,
 
         val (newPopStations, poppedStations) = gs.popStationContainer.updateZombiePopStations(
           time, ((time - gs.startTime) / 30000 + nbrOfPlayers).toInt,
-          math.max(2000: Long, PopStationContainer.popTime - ((time - gs.startTime) / 60000) * 2000),
+          math.max(2500: Long, PopStationContainer.popTime - ((time - gs.startTime) / 60000) * 2000),
           gs.quadtree
         )
 

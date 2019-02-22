@@ -40,7 +40,7 @@ final case class GameState(
   def addPopStations(newTime: Long, popStations: Map[Long, ZombiePopStation]): GameState =
     copy(
       time = newTime,
-      popStationContainer = new PopStationContainer(newTime, popStations, newTime)
+      popStationContainer = new PopStationContainer(newTime, popStationContainer.popStations ++ popStations, newTime)
     )
 
   def stationsPop(newTime: Long, popStationIds: List[Long], zombieIds: List[Long]): GameState =

@@ -2,7 +2,7 @@ package utils
 
 object Constants {
 
-  val hostName: String = "localhost"
+  val hostName: String = "10.3.36.51" // "localhost"
 
   val port: Int = 8080
 

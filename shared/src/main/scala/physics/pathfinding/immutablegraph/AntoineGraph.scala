@@ -90,13 +90,9 @@ object AntoineGraph {
       case (z, zs) => zs.map(_ -> z)
     }).groupBy(_._1).mapValues(_.map(_._2))
 
-    println(s"It took ${new java.util.Date().getTime - startTime} ms to compute")
-
     val allEdges = neighboursMap.toList.flatMap({
       case (z, zs) => zs.map(z -> _)
     })
-
-    println(s"there are ${allEdges.length} edges in the graph.")
 
     (new Graph(allVertices, neighboursMap), inflatedEdges)
   }

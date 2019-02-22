@@ -21,16 +21,27 @@ can play together.)
 
 The game takes place in a 800x600 continuous 2d
 plane. Each player is free to move (using the arrow keys),
-except for some (5) white obstacles.
+except for some white obstacles.
 
 
-Each now and then (actually every 10 seconds),
-triangles (zombies) appear and chase at all times
+Each now and then, triangles (zombies) appear 
+and chase at all times
 the closest player. Once a zombie collides a player,
 that player dies instantly.
 
 
 The last player alive wins the game.
+
+
+The number of zombies that spawn at the same
+time is given by the formula
+`nbrOfPlayers + (timeFromBeginningInSeconds) / 30`
+where the division is an integer division.
+
+
+The time (in seconds) between two zombie spawn
+is given by the formula
+`max(2.5, 10 - timeFromBeginningInMinutes)`.
 
 ## How to play
 

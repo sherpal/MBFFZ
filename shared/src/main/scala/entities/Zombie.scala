@@ -86,10 +86,6 @@ object Zombie {
 //          )
 //      }
 
-    if (deleteZombies.nonEmpty) {
-      println(s"deleted ${deleteZombies.size} zombies.")
-    }
-
     val newZombies = remainingZombies.map({ zombie =>
       val currentPosition = zombie.currentPosition(time - zombie.time)
       val target = playerPositions.minBy(pos => (pos - currentPosition).modulus2)

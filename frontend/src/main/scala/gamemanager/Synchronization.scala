@@ -20,9 +20,7 @@ final class Synchronization(messageSender: Message => Unit) {
 
   def time: Long = new java.util.Date().getTime + delta
 
-  private def endComputingCallback(): Unit = {
-    println(s"Delta was computed: $delta")
-  }
+  private def endComputingCallback(): Unit = {}
 
   private def ping(): Unit = {
     messageSender(Ping(new java.util.Date().getTime))
@@ -57,8 +55,6 @@ final class Synchronization(messageSender: Message => Unit) {
         computeLinkTime()
       } else {
         _synchronized = true
-
-        println(relevantData)
 
         delta = relevantData.sum / relevantData.length
         endComputingCallback()
