@@ -16,7 +16,7 @@ import scala.scalajs.js.typedarray.{ArrayBuffer, Uint8Array}
 
 final class Communicator private (password: String) {
 
-  val webSocket: WebSocket = new WebSocket(s"ws://${dom.window.location.hostname}:8080/connect/$password")
+  val webSocket: WebSocket = new WebSocket(s"ws://${dom.window.location.host}/connect/$password")
   webSocket.binaryType = "arraybuffer"
 
   webSocket.onopen = (_: dom.Event) => {

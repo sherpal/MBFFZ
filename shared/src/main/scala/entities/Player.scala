@@ -56,7 +56,17 @@ object Player {
     val keys: List[String] = List("q", "ArrowLeft")
   }
 
-  private def findDirection(directions: List[Direction]): (Double, Boolean) = {
+  def directionFromString(str: String): Direction = str match {
+    case "Up"    => Up
+    case "Down"  => Down
+    case "Left"  => Left
+    case "Right" => Right
+  }
+
+  /**
+    * Returns the direction angle and whether it is moving.
+    */
+  def findDirection(directions: List[Direction]): (Double, Boolean) = {
     val towards = directions.map(_.z).sum
     (towards.arg, towards != zero)
   }

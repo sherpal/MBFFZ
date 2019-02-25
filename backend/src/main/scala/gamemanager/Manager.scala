@@ -5,6 +5,7 @@ import gamestate.actions.GameEnd
 object Manager {
 
   final val server: GameServer = new GameServer
+  server.startCheckConnection()
 
   sealed trait State
   case object PreGameState extends State

@@ -1,9 +1,11 @@
 package routes.websockets
 
+import ai.AIManager
 import gamemanager.{Manager, PreGameManager}
 import io.undertow.websockets.WebSocketConnectionCallback
 import io.undertow.websockets.core.WebSocketChannel
 import io.undertow.websockets.spi.WebSocketHttpExchange
+import outsidemessages.NewGame
 
 object WebSocketRoute extends cask.Routes {
 
@@ -28,6 +30,20 @@ object WebSocketRoute extends cask.Routes {
           //
           //        channel.resumeReceives()
           Manager.server.clientConnected(new Client(channel), password)
+        }
+      }
+    }
+  }
+
+  @cask.websocket("/ai/:gameName/:aiName")
+  def aiWebSocketConnect(gameName: String, aiName: String): cask.WebsocketResult = {
+    new WebSocketConnectionCallback() {
+      override def onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel): Unit = {
+        if (AIManager.gameHasStarted(gameName)) {
+          channel.setCloseReason("Game has already started.")
+          channel.close()
+        } else {
+          AIManager.clientConnect(NewGame(gameName, aiName), new Client(channel))
         }
       }
     }

@@ -223,7 +223,7 @@ final class ActionCollector(
     }
   }
 
-  def currentGameState: GameState = _currentGameState
+  @inline def currentGameState: GameState = _currentGameState
 
   /**
     * Computes a GameState by adding some other actions to the stack.

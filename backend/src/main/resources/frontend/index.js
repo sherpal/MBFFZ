@@ -5,6 +5,8 @@
         console.log(args)
     }
 
+    const root = window.location.protocol + "//" + window.location.host
+
     function postForm() {
 
         var playerName = document.getElementById("player-name").value
@@ -20,11 +22,11 @@
         var request = new XMLHttpRequest()
         request.open(
             "GET", 
-            "http://" + hostName + ":8080/player-join-form/" + playerName + "/" + playerColour
+            root + "/player-join-form/" + playerName + "/" + playerColour
             )
         request.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                redirect = "http://" + hostName + ":8080/pre-game"
+                redirect = root + "/pre-game"
                 window.location.href = redirect
             }
             if (this.readyState == 4 && this.status == 400) {
@@ -41,7 +43,7 @@
         var request = new XMLHttpRequest()
         request.open(
             "GET",
-            "http://" + hostName + ":8080/menus/colours"
+            root + "/menus/colours"
         )
 
         request.onreadystatechange = function() {

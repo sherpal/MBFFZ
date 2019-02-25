@@ -56,12 +56,6 @@ object MenuRoutes extends cask.Routes {
           ),
           script(
             `type` := "text/javascript",
-            s"""
-               |var hostName = '${MBFFZ.host}'
-           """.stripMargin
-          ),
-          script(
-            `type` := "text/javascript",
             src := "app/index.js"
           )
         )

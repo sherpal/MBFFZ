@@ -55,7 +55,7 @@ trait Server[T] extends AbstractReceiveListener {
 
     println(s"New client from ${client.address}")
 
-    broadcastText(s"New client from ${client.address}")
+    // broadcastText(s"New client from ${client.address}")
   }
 
   def closeCallback(channel: WebSocketChannel, client: Client): Unit
@@ -105,8 +105,6 @@ trait Server[T] extends AbstractReceiveListener {
 
   def startCheckConnection(): Unit =
     checkConnectionsThread.start()
-
-  startCheckConnection()
 
   def killAll(): Unit = {
     for ((channel, _) <- clients) channel.close()

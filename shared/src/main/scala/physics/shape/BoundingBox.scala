@@ -35,5 +35,9 @@ final case class BoundingBox(left: Double, bottom: Double, right: Double, top: D
   def width: Double = right - left
   def height: Double = top - bottom
 
+  def clampToSelf(z: Complex): Complex = Complex(
+    if (z.re > right) right else if (z.re < left) left else z.re,
+    if (z.im > top) top else if (z.im < bottom) bottom else z.im
+  )
 
 }
