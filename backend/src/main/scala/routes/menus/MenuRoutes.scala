@@ -4,7 +4,6 @@ import cask.model.Cookie
 import entities.Player
 import gamemanager.PreGameManager
 import gamemanager.exceptions.GameException
-import main.MBFFZ
 import routes.game.PreGame
 import scalatags.Text.all._
 import upickle.default._

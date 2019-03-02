@@ -217,9 +217,8 @@ final class ActionCollector(
     try {
       _currentGameState = actionsAndStates.head._1(actionsAndStates.head._2)
     } catch {
-      case e: Throwable =>
-        println(actionsAndStates.head._2.filterNot(_.isInstanceOf[UpdatePlayerPos]).mkString("\n"))
-        throw e
+      case _: Throwable =>
+        throw new ActionCollector.FailedToUpdateGameStateException(actionsAndStates)
     }
   }
 
@@ -238,5 +237,12 @@ final class ActionCollector(
     else
       computeGameState(list2.head(startingState), list1, list2.tail)
   }
+
+}
+
+object ActionCollector {
+
+  final class FailedToUpdateGameStateException(val actionAndStates: List[(GameState, List[GameAction])])
+  extends Exception(s"Failed to update game state")
 
 }

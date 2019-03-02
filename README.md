@@ -15,7 +15,7 @@ via WebSockets.
 
 The game essentially serves as a pretext for
 this example. Nonetheless, it's quite fun! The
-more players, the funnier. (Currently only 8 players
+more players, the funnier. (Currently only 10 players
 can play together.)
 
 

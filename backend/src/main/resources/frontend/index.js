@@ -12,7 +12,7 @@
         var playerName = document.getElementById("player-name").value
         var playerColour = document.getElementById("colour-select").value
 
-        console.log(playerName, playerColour)
+        println(playerName, playerColour)
         
         var formData = new FormData()
 
@@ -59,8 +59,6 @@
 
     form.onsubmit = function(event) {
         event.preventDefault()
-
-        console.log(event)
         postForm()
 
         return false

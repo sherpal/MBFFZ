@@ -4,6 +4,7 @@ import entities.{PopStationContainer, Zombie}
 import gamestate.actions.{GameAction, GameEnd, PlayerDies, UpdatePlayerPos}
 import gamestate.{ActionCollector, GameState}
 import messages.Message.ActionList
+import java.io._
 
 import scala.collection.mutable
 
@@ -22,6 +23,26 @@ final class GameManager(playersInfo: Map[String, String], passwords: Map[String,
   val server: GameServer = Manager.server
 
   private val actionCollector: ActionCollector = new ActionCollector(GameState.emptyGameState())
+
+  private var alreadyWrittenLogs: Boolean = false
+  private def writeLogs(actionsAndStates: List[(GameState, List[GameAction])]): Unit = if (!alreadyWrittenLogs) {
+    alreadyWrittenLogs = true
+
+    val time = new java.util.Date().getTime
+
+    val pw = new PrintWriter(new File(s"action-collector-logs/$time-logs.txt"))
+    pw.write(actionsAndStates.head._2.filterNot(_.isInstanceOf[UpdatePlayerPos]).mkString("\n"))
+    pw.close()
+  }
+
+  private def withWriteLogsCheck(body: => Unit): Unit = {
+    try {
+      body
+    } catch {
+      case e: ActionCollector.FailedToUpdateGameStateException =>
+        writeLogs(e.actionAndStates)
+    }
+  }
 
   private def playerName(id: Long): String = playersFromColours(actionCollector.currentGameState.players(id).colour)
 
@@ -57,14 +78,18 @@ final class GameManager(playersInfo: Map[String, String], passwords: Map[String,
   }
 
   def enqueue(action: GameAction): Unit = this.synchronized {
-    actionCollector.addAction(action)
-    queuedActions.enqueue(action)
+    withWriteLogsCheck {
+      actionCollector.addAction(action)
+      queuedActions.enqueue(action)
+    }
   }
 
   def enqueueActions(actions: Seq[GameAction]): Unit = this.synchronized {
     for (action <- actions) queuedActions.enqueue(action)
 
-    actionCollector.addActions(actions)
+    withWriteLogsCheck {
+      actionCollector.addActions(actions)
+    }
   }
 
   def flushActions(): ActionList = this.synchronized {
