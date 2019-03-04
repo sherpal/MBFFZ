@@ -46,7 +46,8 @@ lazy val `frontend` = project.in(file("frontend"))
   .enablePlugins(ScalaJSPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.5"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.5",
+      "com.raquo" %%% "laminar" % "0.6"
     ),
     scalaJSUseMainModuleInitializer := true,
     copyFrontendFastOpt := {

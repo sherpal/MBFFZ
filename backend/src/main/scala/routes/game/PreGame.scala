@@ -1,7 +1,6 @@
 package routes.game
 
 import cask.model.Response
-import entities.Player
 import gamemanager.PreGameManager
 import gamemanager.exceptions.GameException
 import main.MBFFZ
@@ -37,7 +36,7 @@ object PreGame extends cask.Routes {
             padding := "20px",
             borderRadius := "5px",
             div("Players:"),
-            ul(
+            div(
               id := Constants.preGamePlayerListULId,
             ),
             div(
@@ -72,14 +71,7 @@ object PreGame extends cask.Routes {
   def me(password: String): String = write(PreGameManager.playerName(password))
 
   @cask.get("/pre-game/display-players")
-  def displayPlayers(): String = PreGameManager.players.toList.map {
-      case (playerName, colour) =>
-        li(
-          color := Player.playerColours(colour),
-          playerName
-        )
-    }
-    .mkString
+  def displayPlayers(): String = write(PreGameManager.players.toList.toMap)
 
   @cask.get("/pre-game/launch-button")
   def launchButton(): String = button(

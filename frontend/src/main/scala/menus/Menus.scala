@@ -9,6 +9,8 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import utils.Constants
 
+import upickle.default._
+
 import scala.concurrent.Future
 
 object Menus {
@@ -20,8 +22,9 @@ object Menus {
     .withPort(Constants.port)
     .withProtocol(HTTP)
 
-  def playerList: Future[String] =
-    for (players <- boilerPlate.withPath("/pre-game/display-players").send()) yield players.body
+  def playerList: Future[Map[String, String]] =
+    (for (players <- boilerPlate.withPath("/pre-game/display-players").send()) yield players.body)
+    .map(read[Map[String, String]](_))
 
   def launchButton: Future[String] =
     for (response <- boilerPlate.withPath("/pre-game/launch-button").send()) yield response.body
