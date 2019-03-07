@@ -4,6 +4,7 @@ import cask.model.Cookie
 import entities.Player
 import gamemanager.PreGameManager
 import gamemanager.exceptions.GameException
+import main.MBFFZ
 import routes.game.PreGame
 import scalatags.Text.all._
 import upickle.default._
@@ -20,6 +21,9 @@ object MenuRoutes extends cask.Routes {
     cask.Response(
       "<!doctype html>" + html(
         head(
+          meta(
+            charset := "utf-8"
+          )
         ),
         body(
           h1("Welcome to MBFFZ"),
@@ -74,6 +78,7 @@ object MenuRoutes extends cask.Routes {
       cask.Response(
         data = "You've joined",
         statusCode = 200,
+        headers = MBFFZ.noCache,
         cookies = List(Cookie(PreGame.cookieName, password, path = "/"))
       )
     } catch {

@@ -1,43 +1,41 @@
 package menus
 
+import com.raquo.airstream.features.FlattenStrategy
 import org.scalajs.dom
-import org.scalajs.dom.html
 import utils.Constants
-import monix.execution.Scheduler.Implicits.global
 import com.raquo.laminar.api.L._
+import entities.Player
+import websockets.Communicator
 
-import scala.scalajs.js.timers.{SetTimeoutHandle, setTimeout}
+object MenuDisplay extends Owner {
 
-object MenuDisplay {
+  implicit private val strategy: FlattenStrategy.ConcurrentFutureStrategy.type = ConcurrentFutureStrategy
 
-  implicit private class VarWithAssignOp[A](v: Var[A]) {
-    def :=(a: A): Unit = v.set(a)
-  }
-
-  private def delay(body: => Unit): SetTimeoutHandle = setTimeout(0)(body)
-
-  private val childrenVar: Var[List[Element]] = Var(List())
-
-  def changePlayerList(): Unit = delay {
-    for (content <- Menus.playerList) {
-      childrenVar := content.toList.sorted.map {
-          case (playerName, playerColour) =>
-            li(playerName, color := playerColour)
-        }
-    }
-  }
-
-  private val playerList: Element = ul(children <-- childrenVar.signal)
-
+  private val playerListStream: EventStream[List[Element]] = Communicator.communicator.$wsStringMessage
+    .filter(_ == Constants.playerListUpdate)
+    .map((_: String) => Menus.playerList)
+    .flatten
+    .map(_.mapValues(Player.playerColours))
+    .map(_.toList.map {
+      case (playerName, playerColour) =>
+        li(playerName, color := playerColour)
+    })
+  private val playerList: Element = ul(children <-- playerListStream)
   render(dom.document.getElementById(Constants.preGamePlayerListULId), playerList)
 
-  private lazy val launchButtonContainer: html.Div = dom.document.getElementById("launch-btn-container")
-    .asInstanceOf[html.Div]
 
-  def setLaunchButton(): Unit = delay {
-    for (content <- Menus.launchButton) {
-      launchButtonContainer.innerHTML = content
-    }
-  }
+  private val launchGameBus = new EventBus[dom.MouseEvent]()
+  private val $launchGame = launchGameBus.events
+
+  $launchGame.addObserver(Observer((_: dom.MouseEvent) => Menus.launchGame()))(this)
+
+  private val launchButtonStream = Communicator.communicator.$wsStringMessage
+    .filter(_ == Constants.youAreTheHead)
+    .map((_: String) => {
+      val d = button("Launch Game", inContext(_ => onClick.map(ev => ev) --> launchGameBus))
+      d
+    })
+  private val launchButtonWrapper: Element = div(child <-- launchButtonStream)
+  render(dom.document.getElementById(Constants.launchButtonContainerId), launchButtonWrapper)
 
 }

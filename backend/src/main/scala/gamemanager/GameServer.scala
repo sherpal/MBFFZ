@@ -5,6 +5,7 @@ import io.undertow.websockets.core.{BufferedBinaryMessage, BufferedTextMessage, 
 import messages.Message
 import messages.Message.{Ping, Pong}
 import routes.websockets.{Client, Server}
+import utils.Constants
 
 import scala.collection.mutable
 
@@ -16,7 +17,11 @@ final class GameServer extends Server[String] {
 
   def connectionCallback(client: Client, password: String): Unit = this.synchronized {
     _playersFromPW += password -> client
-    broadcastText("player list update")
+    broadcastText(Constants.playerListUpdate)
+
+    if (PreGameManager.isHead(PreGameManager.playerName(password))) {
+      sendTextToClient(Constants.youAreTheHead, client)
+    }
   }
 
   /**

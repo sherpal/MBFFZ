@@ -1,6 +1,7 @@
 
 backend/target
 backend/src/main/resources/frontend/frontend-scala.js
+backend/src/main/resources/frontend/*.js.map
 
 project/target
 project/project/target

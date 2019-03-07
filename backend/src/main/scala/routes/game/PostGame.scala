@@ -12,6 +12,11 @@ object PostGame extends cask.Routes {
     Manager.postGameManager match {
       case Some(postGameManager) =>
         "<!doctype html>" + html(
+          head(
+            meta(
+              charset := "utf-8"
+            )
+          ),
           body(
             h1("Game Over"),
             h2("Scoreboard"),

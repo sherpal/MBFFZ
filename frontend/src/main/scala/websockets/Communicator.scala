@@ -2,19 +2,22 @@ package websockets
 
 import java.nio.ByteBuffer
 
+import com.raquo.airstream.core.Observer
+import com.raquo.airstream.eventbus.EventBus
+import com.raquo.airstream.eventstream.EventStream
+import com.raquo.airstream.ownership.Owner
 import gamemanager.{Game, Synchronization}
 import gamestate.actions.{GameAction, GameEnd}
-import menus.{MenuDisplay, Menus}
+import menus.Menus
 import messages.Message
 import messages.Message.{ActionList, Ping, Pong}
 import org.scalajs.dom
 import org.scalajs.dom.raw.WebSocket
 
 import scala.scalajs.js
-import scala.scalajs.js.timers._
 import scala.scalajs.js.typedarray.{ArrayBuffer, Uint8Array}
 
-final class Communicator private (password: String) {
+final class Communicator private (password: String) extends Owner {
 
   val webSocket: WebSocket = new WebSocket(s"ws://${dom.window.location.host}/connect/$password")
   webSocket.binaryType = "arraybuffer"
@@ -22,6 +25,8 @@ final class Communicator private (password: String) {
   webSocket.onopen = (_: dom.Event) => {
     println("WebSocket opened")
     webSocket.send("Hello Server!")
+
+    $wsStringMessage.addObserver(debugObserver)(owner = this)
 
     synchronizer.computeLinkTime()
   }
@@ -70,16 +75,23 @@ final class Communicator private (password: String) {
     fr.readAsArrayBuffer(blob)
   }
 
-  private def onMessage(message: String): Unit = message match {
-    case "player list update" =>
-      MenuDisplay.changePlayerList()
-    case "you're the head" =>
-      MenuDisplay.setLaunchButton()
-    case idInfo if idInfo.startsWith("id:") =>
-      Game(idInfo.substring(3))
-    case _ =>
-      println(s"Don't know how to process: $message")
+  private val stringMessageStream: EventBus[String] = new EventBus[String]()
+  def $wsStringMessage: EventStream[String] = stringMessageStream.events
+
+  private def onMessage(message: String): Unit = {
+    stringMessageStream.writer.onNext(message)
+    message match {
+      case idInfo if idInfo.startsWith("id:") =>
+        Game(idInfo.substring(3))
+      case _ =>
+        //println(s"Don't know how to process: $message")
+    }
   }
+
+  private val debugObserver = Observer(
+    (message: String) =>
+      println(s"I received: $message")
+  )
 
   webSocket.onmessage = (event: dom.MessageEvent) => {
 

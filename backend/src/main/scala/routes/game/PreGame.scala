@@ -24,6 +24,9 @@ object PreGame extends cask.Routes {
 
     val htmlBody = "<!doctype html>" + html(
       head(
+        meta(
+          charset := "utf-8"
+        )
       ),
       body(
         div(
@@ -40,13 +43,7 @@ object PreGame extends cask.Routes {
               id := Constants.preGamePlayerListULId,
             ),
             div(
-              id := "launch-btn-container",
-              if (PreGameManager.isHead(playerName)) {
-                button(
-                  id := "launch-game",
-                  "Launch Game"
-                )
-              } else ""
+              id := Constants.launchButtonContainerId
             )
           )
         ),

@@ -65,11 +65,19 @@ val copyPath: String = "backend/src/main/resources/frontend/"
 fullOptCompileCopy := {
   val frontendDirectory = (copyFrontendFullOpt in `frontend`).value
   IO.copyFile(frontendDirectory, baseDirectory.value / copyPath / "frontend-scala.js")
+  IO.copyFile(
+    frontendDirectory.getParentFile / "frontend-opt.js.map",
+    baseDirectory.value / copyPath / "frontend-opt.js.map"
+  )
 }
 
 fastOptCompileCopy := {
   val frontendDirectory = (copyFrontendFastOpt in `frontend`).value
   IO.copyFile(frontendDirectory, baseDirectory.value / copyPath / "frontend-scala.js")
+  IO.copyFile(
+    frontendDirectory.getParentFile / "frontend-fastopt.js.map",
+    baseDirectory.value / copyPath / "frontend-fastopt.js.map"
+  )
 }
 
 run in Compile := (run in Compile in server).evaluated
