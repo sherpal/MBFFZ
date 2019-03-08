@@ -1,5 +1,6 @@
 package main
 
+import gamemanager.Game
 import menus.MenuDisplay
 import org.scalajs.dom
 import websockets.Communicator
@@ -17,6 +18,7 @@ object Main {
 
     Communicator(password)
     MenuDisplay
+    Game
 
   }
 

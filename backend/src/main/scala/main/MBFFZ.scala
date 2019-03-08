@@ -24,4 +24,10 @@ object MBFFZ extends cask.Main(
     "Expires" -> "0"
   )
 
+  override def main(args: Array[String]): Unit = {
+    super.main(args)
+
+    println(s"Server started on $host:$port")
+  }
+
 }

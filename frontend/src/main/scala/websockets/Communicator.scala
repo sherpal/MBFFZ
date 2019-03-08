@@ -80,12 +80,6 @@ final class Communicator private (password: String) extends Owner {
 
   private def onMessage(message: String): Unit = {
     stringMessageStream.writer.onNext(message)
-    message match {
-      case idInfo if idInfo.startsWith("id:") =>
-        Game(idInfo.substring(3))
-      case _ =>
-        //println(s"Don't know how to process: $message")
-    }
   }
 
   private val debugObserver = Observer(

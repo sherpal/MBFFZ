@@ -49,6 +49,7 @@ object PreGame extends cask.Routes {
         ),
         div(
           id := "game-content",
+          display := "flex",
           ""
         ),
         script(

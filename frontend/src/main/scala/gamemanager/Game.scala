@@ -1,12 +1,14 @@
 package gamemanager
 
+import com.raquo.airstream.core.Observer
+import com.raquo.airstream.ownership.Owner
 import entities.Player
 import gamedrawer.GameDrawer
 import gamestate.{ActionCollector, GameState}
 import gamestate.actions.{GameAction, UpdatePlayerPos}
 import org.scalajs.dom
 import websockets.Communicator
-import entities.Player.{Up, Left, Right, Down}
+import entities.Player.{Down, Left, Right, Up}
 
 final class Game private (val myId: Long) {
 
@@ -76,7 +78,7 @@ final class Game private (val myId: Long) {
 
 }
 
-object Game {
+object Game extends Owner {
 
   private var _game: Option[Game] = None
 
@@ -86,5 +88,10 @@ object Game {
     _game = Some(new Game(id.toLong))
     game
   }
+
+  Communicator.communicator.$wsStringMessage
+    .filter(_.startsWith("id:"))
+    .map(_.substring(3))
+    .addObserver(Observer(id => Game(id)))(this)
 
 }

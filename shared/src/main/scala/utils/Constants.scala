@@ -7,6 +7,7 @@ object Constants {
   final val port: Int = 8080
 
   final val preGamePlayerListULId: String = "players-list"
+  final val duringGamePlayerListULId: String = "players-list-in-game"
   final val launchButtonContainerId: String = "launch-btn-container"
 
   final val youAreTheHead: String = "you're the head"
