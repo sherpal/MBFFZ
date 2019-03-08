@@ -27,14 +27,13 @@ object MenuDisplay extends Owner {
   private val launchGameBus = new EventBus[dom.MouseEvent]()
   private val $launchGame = launchGameBus.events
 
-  $launchGame.addObserver(Observer((_: dom.MouseEvent) => Menus.launchGame()))(this)
+  $launchGame
+    .filter(_.button == 0)
+    .addObserver(Observer((_: dom.MouseEvent) => Menus.launchGame()))(this)
 
   private val launchButtonStream = Communicator.communicator.$wsStringMessage
     .filter(_ == Constants.youAreTheHead)
-    .map((_: String) => {
-      val d = button("Launch Game", inContext(_ => onClick.map(ev => ev) --> launchGameBus))
-      d
-    })
+    .map((_: String) => button("Launch Game", inContext(_ => onClick.map(ev => ev) --> launchGameBus)))
   private val launchButtonWrapper: Element = div(child <-- launchButtonStream)
   render(dom.document.getElementById(Constants.launchButtonContainerId), launchButtonWrapper)
 
