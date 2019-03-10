@@ -6,6 +6,7 @@ import com.raquo.airstream.core.Observer
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.Owner
+import com.raquo.laminar.api.L.windowEvents
 import gamemanager.Synchronization
 import gamestate.actions.{GameAction, GameEnd}
 import menus.Menus
@@ -107,6 +108,14 @@ final class Communicator private (password: String) extends Owner {
     println("Error")
     println(event)
   }
+
+  windowEvents.onBeforeUnload.map(_ => {
+    // https://stackoverflow.com/questions/4812686/closing-websocket-correctly-html5-javascript
+    webSocket.onclose = _ => {}
+    webSocket.close()
+  })
+
+
 
   @inline def getTime: Long = synchronizer.time
 
