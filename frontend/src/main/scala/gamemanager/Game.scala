@@ -30,7 +30,7 @@ final class Game private (val myId: Long) extends Owner {
     GameState.emptyGameState()
   )
 
-  ((action: GameAction) => actionCollector.addAction(action)) <-- Communicator.communicator.$messages
+  ((action: GameAction) => actionCollector.addAction(action)) <-- Communicator.communicator.$gameAction
 
   private def updatePlayersPredictions(players: List[Player], currentTime: Long): List[UpdatePlayerPos] = {
     players.filterNot(_.id == myId).map(player => (player, player.currentPosition(currentTime - player.time)))

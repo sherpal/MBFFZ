@@ -44,17 +44,17 @@ final class Communicator private (password: String) extends Owner {
 
   private val synchronizer: Synchronization = new Synchronization(sendMessage)
 
-  private val messageBus: EventBus[GameAction] = new EventBus[GameAction]()
-  val $messages: EventStream[GameAction] = messageBus.events
+  private val gameActionBus: EventBus[GameAction] = new EventBus[GameAction]()
+  val $gameAction: EventStream[GameAction] = gameActionBus.events
 
   private def onMessage(message: Message): Unit = {
     message match {
       case _: GameEnd =>
         Menus.moveToPostGame()
       case gameAction: GameAction =>
-        messageBus.writer.onNext(gameAction)
+        gameActionBus.writer.onNext(gameAction)
       case ActionList(actions) =>
-        actions.foreach(action => messageBus.writer.onNext(action.asInstanceOf[GameAction]))
+        actions.foreach(action => gameActionBus.writer.onNext(action.asInstanceOf[GameAction]))
       case pong: Pong => synchronizer.receivePong(pong)
       case Ping(sendingTime) => sendMessage(Pong(sendingTime, new java.util.Date().getTime))
       case _ =>

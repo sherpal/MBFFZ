@@ -7,6 +7,9 @@ game server using the amazing
 
 The game frontend uses
 [Scala.js](http://www.scala-js.org/)
+as well as the
+[Laminar](https://github.com/raquo/Laminar)
+framework,
 and the (real time) communication uses
 [boopickle](https://github.com/suzaku-io/boopickle)
 via WebSockets.
@@ -26,7 +29,9 @@ except for some white obstacles.
 
 Each now and then, triangles (zombies) appear 
 and chase at all times
-the closest player. Once a zombie collides a player,
+the closest player (that is, they change their mind
+all the time). 
+Once a zombie collides a player,
 that player dies instantly.
 
 
@@ -61,6 +66,9 @@ using Scala.js, and to copy it in `backend/src/main/resources/frontend`)
 Now every player may go in a browser to
 `http://[host]:8080/`. /!\ They must be on the
 same wifi, otherwise you'll need to do more!
+Note that the players don't need to have anything
+installed, only the computer server has to have sbt
+installed.
 
 ### Bugs
 

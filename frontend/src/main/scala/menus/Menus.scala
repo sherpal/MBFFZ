@@ -20,7 +20,7 @@ object Menus {
 
   val root: String = s"http://${Constants.hostName}:${Constants.port}/"
 
-  val boilerPlate: HttpRequest = HttpRequest()
+  private val boilerPlate: HttpRequest = HttpRequest()
     .withHost(Constants.hostName)
     .withPort(Constants.port)
     .withProtocol(HTTP)
