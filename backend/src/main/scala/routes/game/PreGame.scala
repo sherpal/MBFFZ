@@ -30,7 +30,7 @@ object PreGame extends cask.Routes {
       ),
       body(
         div(
-          id := "pre-game-content",
+          id := Constants.preGameContentId,
           h1("Game joined"),
           h2(s"You joined the game as $playerName"),
           div(
@@ -48,7 +48,7 @@ object PreGame extends cask.Routes {
           )
         ),
         div(
-          id := "game-content",
+          id := Constants.gameContentId,
           display := "flex",
           ""
         ),

@@ -1,6 +1,8 @@
 package gamemanager
 
 import com.raquo.airstream.core.Observer
+import com.raquo.airstream.eventbus.EventBus
+import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.Owner
 import entities.Player
 import gamedrawer.GameDrawer
@@ -10,12 +12,14 @@ import org.scalajs.dom
 import websockets.Communicator
 import entities.Player.{Down, Left, Right, Up}
 
-final class Game private (val myId: Long) {
+import scala.scalajs.js.timers.setInterval
+
+final class Game private (val myId: Long) extends Owner {
 
   println("Game is about to start.")
   println(s"My id is $myId")
 
-  GameDrawer.showCanvas()
+  GameDrawer
 
   private val actionCollector: ActionCollector = new ActionCollector(
     GameState.emptyGameState()
@@ -76,9 +80,22 @@ final class Game private (val myId: Long) {
 
   dom.window.requestAnimationFrame((_: Double) => run(getTime))
 
+
+  /**
+    * Each second, we push through the elapsedTime stream the number of seconds elapsed since the beginning of
+    * the game.
+    */
+  setInterval(1000) {
+    Game.elapsedTimeBus.writer.onNext(Communicator.communicator.getTime - actionCollector.currentGameState.startTime)
+  }
+
+
 }
 
 object Game extends Owner {
+
+  private val elapsedTimeBus: EventBus[Long] = new EventBus[Long]()
+  def $elapsedTime: EventStream[Long] = elapsedTimeBus.events
 
   private var _game: Option[Game] = None
 

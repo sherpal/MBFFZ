@@ -1,72 +1,36 @@
 package gamedrawer
 
-import org.scalajs.dom.raw.CanvasRenderingContext2D
+import com.raquo.airstream.core.Observer
+import com.raquo.airstream.ownership.Owner
 import physics.Complex
 import physics.shape.{Circle, Polygon}
 import entities.{Obstacle, Player, Zombie, ZombiePopStation}
+import gamedom.GameContent
 import gamemanager.Game
 import gamestate.GameState
-import org.scalajs.dom
-import org.scalajs.dom.html
-import scalatags.Text.all._
-import scalatags.Text.all.{canvas => domCanvas}
 
 import scala.collection.mutable
 
-object GameDrawer {
+object GameDrawer extends Owner {
 
-  private lazy val canvas: html.Canvas = dom.document.getElementById("game-canvas").asInstanceOf[html.Canvas]
-  private lazy val boundingRect = canvas.getBoundingClientRect()
+  private val canvas = GameContent()
+  private val ctx = canvas.ctx
 
-  def showCanvas(): Unit = {
-    dom.document.getElementById("pre-game-content").asInstanceOf[html.Div].style.display = "none"
-    dom.document.getElementById("game-content").innerHTML = domCanvas(
-      width := 800,
-      height := 600,
-      id := "game-canvas",
-      tabindex := "1"
-    ).render
-
-    canvas.width = 800
-    canvas.height = 600
-
-    canvas.onmousemove = (mouseEvent: dom.MouseEvent) => {
-      mousePosition = (
-        mouseEvent.clientX - boundingRect.left,
-        mouseEvent.clientY - boundingRect.top
-      )
-    }
-
-    canvas.onkeydown = (keyboardEvent: dom.KeyboardEvent) => {
-      pressedKeys += keyboardEvent.key
-    }
-
-    canvas.onkeyup = (keyboardEvent: dom.KeyboardEvent) => {
-      pressedKeys -= keyboardEvent.key
-    }
-
-    canvas.focus()
-  }
-
-  private lazy val ctx: CanvasRenderingContext2D = canvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-
-  var mousePosition: (Double, Double) = (0, 0)
-
-  def mouseComplexPosition: Complex = changeCoordinate(mousePosition._1, mousePosition._2)
-
-  def clear(): Unit = {
-    ctx.fillStyle = "black"
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-  }
+  def mouseComplexPosition: Complex = changeCoordinate(canvas.mousePosition.now())
 
   def changeCoordinate(worldPos: Complex): (Double, Double) = (
     worldPos.re + canvas.width / 2, canvas.height / 2 - worldPos.im
   )
 
   def changeCoordinate(x: Double, y: Double): Complex = Complex(x - canvas.width / 2, canvas.height / 2 - y)
+  def changeCoordinate(pos: (Double, Double)): Complex = changeCoordinate(pos._1, pos._2)
 
   private val pressedKeys: mutable.Set[String] = mutable.Set()
   def isPressed(direction: entities.Player.Direction): Boolean = direction.keys.exists(pressedKeys.contains)
+  canvas.$pressedKeysInfo.addObserver(Observer[(String, Boolean)] {
+    case (key, true) => pressedKeys += key
+    case (key, false) => pressedKeys -= key
+  })(this)
 
   private val zombieColor: String = "#ccc"
   private val obstacleColor: String = "white"
@@ -130,7 +94,7 @@ object GameDrawer {
 
   def drawGameState(gameState: GameState): Unit = {
     val time = Game.game.getTime
-    clear()
+    canvas.clear()
     drawObstacles(gameState.obstacles)
     drawPopStations(gameState.popStationContainer.popStations.values)
     drawZombies(gameState.zombies.values, time)

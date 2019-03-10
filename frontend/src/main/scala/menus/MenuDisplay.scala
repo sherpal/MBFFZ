@@ -4,7 +4,6 @@ import com.raquo.airstream.features.FlattenStrategy
 import org.scalajs.dom
 import utils.Constants
 import com.raquo.laminar.api.L._
-import entities.Player
 import websockets.Communicator
 
 object MenuDisplay extends Owner {
@@ -13,13 +12,8 @@ object MenuDisplay extends Owner {
 
   private val playerListStream: EventStream[List[Element]] = Communicator.communicator.$wsStringMessage
     .filter(_ == Constants.playerListUpdate)
-    .map((_: String) => Menus.playerList)
+    .map((_: String) => Menus.liPlayerList)
     .flatten
-    .map(_.mapValues(Player.playerColours))
-    .map(_.toList.map {
-      case (playerName, playerColour) =>
-        li(playerName, color := playerColour)
-    })
   private val playerList: Element = ul(children <-- playerListStream)
   render(dom.document.getElementById(Constants.preGamePlayerListULId), playerList)
 
