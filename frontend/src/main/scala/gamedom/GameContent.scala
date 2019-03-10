@@ -10,7 +10,7 @@ object GameContent {
   private val gameContentDiv: html.Div = dom.document.getElementById(Constants.gameContentId).asInstanceOf[html.Div]
 
   private val parentDiv = div(
-    padding := "10px",
+    padding := "20px",
     display := "flex"
   )
 

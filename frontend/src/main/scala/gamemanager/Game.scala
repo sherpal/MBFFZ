@@ -16,6 +16,11 @@ import scala.scalajs.js.timers.setInterval
 
 final class Game private (val myId: Long) extends Owner {
 
+  private implicit class ObserverWithArrow[T](callback: T => Unit) {
+    def <--(stream: EventStream[T]): Unit =
+      stream.addObserver(Observer(callback))(Game.this)
+  }
+
   println("Game is about to start.")
   println(s"My id is $myId")
 
@@ -25,13 +30,7 @@ final class Game private (val myId: Long) extends Owner {
     GameState.emptyGameState()
   )
 
-  def receiveActions(actions: List[GameAction]): Unit = {
-    actionCollector.addActions(actions)
-  }
-
-  def receiveAction(action: GameAction): Unit = {
-    actionCollector.addAction(action)
-  }
+  ((action: GameAction) => actionCollector.addAction(action)) <-- Communicator.communicator.$messages
 
   private def updatePlayersPredictions(players: List[Player], currentTime: Long): List[UpdatePlayerPos] = {
     players.filterNot(_.id == myId).map(player => (player, player.currentPosition(currentTime - player.time)))
@@ -82,7 +81,7 @@ final class Game private (val myId: Long) extends Owner {
 
 
   /**
-    * Each second, we push through the elapsedTime stream the number of seconds elapsed since the beginning of
+    * Each second, we push through the elapsedTime stream the number of milliseconds elapsed since the beginning of
     * the game.
     */
   setInterval(1000) {

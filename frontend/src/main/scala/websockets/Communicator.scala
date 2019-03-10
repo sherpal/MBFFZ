@@ -6,7 +6,7 @@ import com.raquo.airstream.core.Observer
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.Owner
-import gamemanager.{Game, Synchronization}
+import gamemanager.Synchronization
 import gamestate.actions.{GameAction, GameEnd}
 import menus.Menus
 import messages.Message
@@ -43,15 +43,18 @@ final class Communicator private (password: String) extends Owner {
 
   private val synchronizer: Synchronization = new Synchronization(sendMessage)
 
+  private val messageBus: EventBus[GameAction] = new EventBus[GameAction]()
+  val $messages: EventStream[GameAction] = messageBus.events
+
   private def onMessage(message: Message): Unit = {
     message match {
-      case pong: Pong => synchronizer.receivePong(pong)
       case _: GameEnd =>
         Menus.moveToPostGame()
       case gameAction: GameAction =>
-        Game.game.receiveAction(gameAction)
+        messageBus.writer.onNext(gameAction)
       case ActionList(actions) =>
-        Game.game.receiveActions(actions.map(_.asInstanceOf[GameAction]))
+        actions.foreach(action => messageBus.writer.onNext(action.asInstanceOf[GameAction]))
+      case pong: Pong => synchronizer.receivePong(pong)
       case Ping(sendingTime) => sendMessage(Pong(sendingTime, new java.util.Date().getTime))
       case _ =>
         println(message)
