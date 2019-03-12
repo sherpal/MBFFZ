@@ -10,28 +10,39 @@ import gamestate.{ActionCollector, GameState}
 import gamestate.actions.{GameAction, UpdatePlayerPos}
 import org.scalajs.dom
 import websockets.Communicator
-import entities.Player.{Down, Left, Right, Up}
 
 import scala.scalajs.js.timers.setInterval
 
+/**
+  * Contains the game loop.
+  *
+  * In this game the game loop is quite simple:
+  * - put all players at their current position
+  * - move this player according to the pressed keys
+  * - draw the game
+  */
 final class Game private (val myId: Long) extends Owner {
 
+  /** Being fancy for nothing. */
   private implicit class ObserverWithArrow[T](callback: T => Unit) {
     def <--(stream: EventStream[T]): Unit =
       stream.addObserver(Observer(callback))(Game.this)
   }
 
-  println("Game is about to start.")
-  println(s"My id is $myId")
+  if (scala.scalajs.LinkingInfo.developmentMode) {
+    println("Game is about to start.")
+    println(s"My id is $myId")
+  }
 
   GameDrawer
 
-  private val actionCollector: ActionCollector = new ActionCollector(
-    GameState.emptyGameState()
-  )
+  /** Initialize the ActionCollector */
+  private val actionCollector: ActionCollector = new ActionCollector(GameState.emptyGameState())
 
-  ((action: GameAction) => actionCollector.addAction(action)) <-- Communicator.communicator.$gameAction
+  /** Registering to the GameAction flow from the [[Communicator]] */
+  ((action: GameAction) => actionCollector.addAction(action)) <-- Communicator.$gameAction
 
+  /** Maps every other player to their current positions. */
   private def updatePlayersPredictions(players: List[Player], currentTime: Long): List[UpdatePlayerPos] = {
     players.filterNot(_.id == myId).map(player => (player, player.currentPosition(currentTime - player.time)))
       .map({
@@ -41,19 +52,27 @@ final class Game private (val myId: Long) extends Owner {
 
   }
 
-  @inline def getTime: Long = Communicator.communicator.getTime
+  @inline def getTime: Long = Communicator.getTime
 
+  /** Moves this player according to the pressed keys. */
   private def move(time: Long, gs: GameState): Option[UpdatePlayerPos] = gs.players.get(myId).map {
     player =>
       val newPlayer = Player.updatePlayer(
         time, player,
-        List(Up, Down, Right, Left).filter(GameDrawer.isPressed),
+        Player.Direction.directions.filter(GameDrawer.isPressed),  // easy way to handle the 9 possibilities
         gs.quadtree, GameState.worldBox
       )
 
       UpdatePlayerPos(0, time, newPlayer.id, newPlayer.pos, newPlayer.direction, newPlayer.moving)
   }
 
+  /**
+    * Game loop.
+    *
+    * This uses the `refreshAnimationFrame`
+    *
+    * @param lastTime last time the loop ran
+    */
   private def run(lastTime: Long): Unit = {
     val time = getTime
 
@@ -64,7 +83,7 @@ final class Game private (val myId: Long) extends Owner {
     val updatePlayerPos = move(time, currentGameState)
 
     if (updatePlayerPos.isDefined) {
-      Communicator.communicator.sendMessage(updatePlayerPos.get)
+      Communicator.sendMessage(updatePlayerPos.get)
     }
 
     val predictedGameState = currentGameState(
@@ -85,7 +104,7 @@ final class Game private (val myId: Long) extends Owner {
     * the game.
     */
   setInterval(1000) {
-    Game.elapsedTimeBus.writer.onNext(Communicator.communicator.getTime - actionCollector.currentGameState.startTime)
+    Game.elapsedTimeBus.writer.onNext(Communicator.getTime - actionCollector.currentGameState.startTime)
   }
 
 
@@ -100,12 +119,12 @@ object Game extends Owner {
 
   @inline def game: Game = _game.get
 
-  def apply(id: String): Game = {
+  private def apply(id: String): Game = {
     _game = Some(new Game(id.toLong))
     game
   }
 
-  Communicator.communicator.$wsStringMessage
+  Communicator.$wsStringMessage
     .filter(_.startsWith("id:"))
     .map(_.substring(3))
     .addObserver(Observer(id => Game(id)))(this)

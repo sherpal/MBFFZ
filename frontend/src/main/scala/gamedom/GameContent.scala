@@ -5,13 +5,16 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import utils.Constants
 
+
+/**
+  * Gathers the game canvas and game information in a div.
+  */
 object GameContent {
 
   private val gameContentDiv: html.Div = dom.document.getElementById(Constants.gameContentId).asInstanceOf[html.Div]
 
   private val parentDiv = div(
-    padding := "20px",
-    display := "flex"
+    display := "flex"  // putting the game info at the right of the game canvas.
   )
 
   def apply(): GameCanvas = {

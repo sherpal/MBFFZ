@@ -40,20 +40,23 @@ object Player {
     val keys: List[String]
   }
   case object Up extends Direction {
-    val z: Complex = i
-    val keys: List[String] = List("z", "ArrowUp")
+    final val z: Complex = i
+    final val keys: List[String] = List("z", "ArrowUp")
   }
   case object Down extends Direction {
-    val z: Complex = -i
-    val keys: List[String] = List("s", "ArrowDown")
+    final val z: Complex = -i
+    final val keys: List[String] = List("s", "ArrowDown")
   }
   case object Right extends Direction {
-    val z: Complex = 1
-    val keys: List[String] = List("d", "ArrowRight")
+    final val z: Complex = 1
+    final val keys: List[String] = List("d", "ArrowRight")
   }
   case object Left extends Direction {
-    val z: Complex = -1
-    val keys: List[String] = List("q", "ArrowLeft")
+    final val z: Complex = -1
+    final val keys: List[String] = List("q", "ArrowLeft")
+  }
+  object Direction {
+    final val directions: List[Direction] = List(Up, Down, Right, Left)
   }
 
   def directionFromString(str: String): Direction = str match {

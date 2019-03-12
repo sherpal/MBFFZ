@@ -9,6 +9,7 @@ import com.raquo.airstream.ownership.Owner
 import com.raquo.laminar.api.L.windowEvents
 import gamemanager.Synchronization
 import gamestate.actions.{GameAction, GameEnd}
+import main.Main
 import menus.Menus
 import messages.Message
 import messages.Message.{ActionList, Ping, Pong}
@@ -18,20 +19,34 @@ import org.scalajs.dom.raw.WebSocket
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.{ArrayBuffer, Uint8Array}
 
-final class Communicator private (password: String) extends Owner {
+/**
+  * The Communicator is in charge of WebSocket communication with the server.
+  * It feeds different kind of streams when it receives messages.
+  */
+object Communicator extends Owner {
 
-  val webSocket: WebSocket = new WebSocket(s"ws://${dom.window.location.host}/connect/$password")
+  private val password: String = Main.password
+
+  /**
+    * Reference to the WebSocket that talks to the server.
+    */
+  private val webSocket: WebSocket = new WebSocket(s"ws://${dom.window.location.host}/connect/$password")
   webSocket.binaryType = "arraybuffer"
 
   webSocket.onopen = (_: dom.Event) => {
-    println("WebSocket opened")
-    webSocket.send("Hello Server!")
+    if (scala.scalajs.LinkingInfo.developmentMode) {
+      println("WebSocket opened")
+    }
+    webSocket.send("Hello Server!") // why not
 
-    $wsStringMessage.addObserver(debugObserver)(owner = this)
+    if (scala.scalajs.LinkingInfo.developmentMode) {
+      $wsStringMessage.addObserver(debugObserver)(owner = this)
+    }
 
-    synchronizer.computeLinkTime()
+    synchronizer.computeLinkTime() // synchronizing watches with the server
   }
 
+  /** Sends a [[Message]] to the server (is there a better way to do this!?) */
   def sendMessage(message: Message): Unit = {
     val array = Message.encodeToBytes(message)
     val arrayBuffer = new ArrayBuffer(array.length)
@@ -44,6 +59,7 @@ final class Communicator private (password: String) extends Owner {
 
   private val synchronizer: Synchronization = new Synchronization(sendMessage)
 
+  /** Fed by the communication with the server, when it sends a GameAction */
   private val gameActionBus: EventBus[GameAction] = new EventBus[GameAction]()
   val $gameAction: EventStream[GameAction] = gameActionBus.events
 
@@ -79,11 +95,12 @@ final class Communicator private (password: String) extends Owner {
     fr.readAsArrayBuffer(blob)
   }
 
+  /** Fed by the string messages received by the server. */
   private val stringMessageStream: EventBus[String] = new EventBus[String]()
   def $wsStringMessage: EventStream[String] = stringMessageStream.events
 
   private def onMessage(message: String): Unit = {
-    stringMessageStream.writer.onNext(message)
+    stringMessageStream.writer.onNext(message) // this is beautiful
   }
 
   private val debugObserver = Observer(
@@ -92,9 +109,7 @@ final class Communicator private (password: String) extends Owner {
   )
 
   webSocket.onmessage = (event: dom.MessageEvent) => {
-
-    val message = event.data
-    message match {
+    event.data match { // dispatch with respect to the type of stuff received
       case msg: String => onMessage(msg)
       case arrayBuffer: ArrayBuffer => onMessage(arrayBuffer)
       case bytes: ByteBuffer => onMessage(bytes)
@@ -115,20 +130,6 @@ final class Communicator private (password: String) extends Owner {
     webSocket.close()
   })
 
-
-
   @inline def getTime: Long = synchronizer.time
-
-}
-
-object Communicator {
-
-  private var _communicator: Communicator = _
-  @inline def communicator: Communicator = _communicator
-
-  def apply(password: String): Communicator = {
-    _communicator = new Communicator(password)
-    communicator
-  }
 
 }

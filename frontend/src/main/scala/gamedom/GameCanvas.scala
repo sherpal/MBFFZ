@@ -7,6 +7,9 @@ import org.scalajs.dom.html
 import org.scalajs.dom.html.Canvas
 import org.scalajs.dom.raw.CanvasRenderingContext2D
 
+/**
+  * Creates the canvas in which the game is drawn.
+  */
 final class GameCanvas extends Component[html.Canvas] {
 
   private implicit class VarWithAssignOp[T](v: Var[T]) {
@@ -23,6 +26,7 @@ final class GameCanvas extends Component[html.Canvas] {
 
   val mousePosition: Var[(Double, Double)] = Var((0, 0))
 
+  /** The `mousePosition` is updated in the `onMouseMove` of the canvas. */
   private val mouseMoveObserver = Observer[(Double, Double)](pair => mousePosition := pair)
 
   val gameCanvas: ReactiveHtmlElement[html.Canvas] = canvas(
@@ -33,12 +37,16 @@ final class GameCanvas extends Component[html.Canvas] {
         ev.clientY - canvas.ref.getBoundingClientRect().top)
       ) --> mouseMoveObserver
     ),
-    onKeyDown.map(ev => (ev.key, true)) --> pressedKeysBus,
-    onKeyUp.map(ev => (ev.key, false)) --> pressedKeysBus
+    onKeyDown.map(ev => (ev.key, true)) --> pressedKeysBus,  // adding to pressed keys
+    onKeyUp.map(ev => (ev.key, false)) --> pressedKeysBus    // removing from pressed keys
   )
 
+  /**
+    * We can't use the width := 800 modifier as html.Canvas is kinda glitchy in that regard.
+    */
   gameCanvas.ref.width = 800
   gameCanvas.ref.height = 600
+  /** Immediately gives the focus otherwise it will not respond to key strokes. */
   gameCanvas.ref.focus()
 
   val ctx: CanvasRenderingContext2D = gameCanvas.ref.getContext("2d").asInstanceOf[CanvasRenderingContext2D]

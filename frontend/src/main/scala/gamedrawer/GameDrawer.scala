@@ -11,6 +11,12 @@ import gamestate.GameState
 
 import scala.collection.mutable
 
+/**
+  * This object is in charge of drawing the game in the canvas.
+  *
+  * The GameState is designed to be "self-contained", so it's the only thing that the game drawer needs
+  * to draw the game.
+  */
 object GameDrawer extends Owner {
 
   private val canvas = GameContent()
