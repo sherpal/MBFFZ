@@ -9,6 +9,9 @@ import physics.Complex
 
 trait Message
 
+/**
+  * boopickle stuff
+  */
 object Message {
 
   case class Ping(sendingTime: Long) extends Message

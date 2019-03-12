@@ -2,11 +2,27 @@ package physics.pathfinding.immutablegraph
 
 import physics.Complex
 
+/**
+  * A Graph is a set of vertices that are connected together.
+  * The connection information is stored in the `neighboursMap` which maps a vertex to all its neighbours.
+  * @param vertices complex numbers in the graph
+  * @param neighboursMap describes the relationship between vertices.
+  */
 final class Graph(
                    val vertices: Vector[Complex],
                    val neighboursMap: Map[Complex, List[Complex]]
                  ) {
 
+  /**
+    * Finds the shortest path between the start and the end in the graph.
+    *
+    * Implements a simple A* algorithm
+    *
+    * @param start starting point of the path.
+    * @param end end of the path
+    * @param heuristicFunction guess of the distance between two points. Usually the L2-norm
+    * @return if the shortest path exists, returns it wrapped in Some. Otherwise returns None
+    */
   def a_*(start: Complex, end: Complex,
           heuristicFunction: (Complex, Complex) => Double): Option[Seq[Complex]] = {
 

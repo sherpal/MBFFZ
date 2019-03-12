@@ -1,5 +1,8 @@
 package utils
 
+/**
+  * Some constants shared by the frontend and the backend.
+  */
 object Constants {
 
   final val hostName: String = "0.0.0.0"

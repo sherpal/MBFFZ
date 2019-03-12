@@ -4,6 +4,16 @@ import physics.Complex
 import physics.quadtree.ShapeQT
 import physics.shape.{Polygon, Segment, Shape}
 
+/**
+  * Constructs a graph for the mobs to live in, avoiding obstacles in the way.
+  *
+  * The algorithm to build the graph is quite naive but I believe fast enough for the purpose of the games
+  * I want to implement.
+  *
+  * - We "inflate" all the obstacles to get the maximum area where a mob of a given radius can live in
+  * - For each pair of these newly created obstacles, we keep only those that do not cross another obstacle.
+  * That's it!
+  */
 object AntoineGraph {
 
   private implicit class ShapeWithEdge(shape: Shape) {
@@ -59,8 +69,6 @@ object AntoineGraph {
   }
 
   def apply(quadTree: ShapeQT, radius: Double): (Graph, List[Segment]) = {
-    val startTime = new java.util.Date().getTime
-
     val obstacles = quadTree.shapes
 
     val verticesPerObstacles = obstacles.map(_.inflateWithoutPolygon(radius))
@@ -89,10 +97,6 @@ object AntoineGraph {
     val neighboursMap = neighboursMapOneWay ++ neighboursMapOneWay.toList.flatMap({
       case (z, zs) => zs.map(_ -> z)
     }).groupBy(_._1).mapValues(_.map(_._2))
-
-    val allEdges = neighboursMap.toList.flatMap({
-      case (z, zs) => zs.map(z -> _)
-    })
 
     (new Graph(allVertices, neighboursMap), inflatedEdges)
   }

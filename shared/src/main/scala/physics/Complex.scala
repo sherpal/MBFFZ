@@ -6,7 +6,11 @@ import upickle.default.{ReadWriter, macroRW}
 import scala.language.implicitConversions
 import math._
 
-
+/**
+  * Simple implementation of Complex numbers, because I like them.
+  * @param re real part
+  * @param im imaginary part
+  */
 final case class Complex(re: Double, im: Double) extends Message {
   def +(other: Complex) = Complex(re + other.re, im + other.im)
 

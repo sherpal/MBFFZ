@@ -3,6 +3,9 @@ package physics.quadtree
 import physics.Complex
 import physics.shape.{BoundingBox, Polygon, Shape}
 
+/**
+  * QuadTree to check Bodies to obstacles collision.
+  */
 final class ShapeQT private (
                               subTrees: List[ShapeQT],
                               val shapes: List[Polygon],

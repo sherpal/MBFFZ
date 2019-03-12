@@ -6,6 +6,12 @@ import physics.shape.{BoundingBox, Segment}
 import entities._
 import gamestate.actions.{GameAction, InitialGameState, NewPlayerInfo, UpdatePlayerPos}
 
+/**
+  * Knows everything that's in the game at a given point.
+  * Self-contained by design.
+  *
+  * Updated via [[GameAction]]s
+  */
 final case class GameState(
                             startTime: Long,
                             time: Long,
