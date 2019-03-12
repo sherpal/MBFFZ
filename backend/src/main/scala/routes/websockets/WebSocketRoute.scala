@@ -10,8 +10,13 @@ import outsidemessages.NewGame
 object WebSocketRoute extends cask.Routes {
 
 
+  /**
+    * When a handshake is started by a Client, we check that the password exists. If it doesn't, we
+    * abort the connection. If it does, we connect the [[Client]] to the [[Server]].
+    * @param password game password given to the player when their resquested joining the game.
+    */
   @cask.websocket("/connect/:password")
-  def websocketConnect(password: String): cask.WebsocketResult = {
+  def webSocketConnect(password: String): cask.WebsocketResult = {
     if (!PreGameManager.isPlaying(password)) {
       cask.Response(s"Incorrect password: $password", 400)
     } else {

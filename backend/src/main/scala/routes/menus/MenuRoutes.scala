@@ -11,10 +11,12 @@ import upickle.default._
 
 object MenuRoutes extends cask.Routes {
 
+  /** Returns the list of available colours, wrapped in option tags. */
   private def remainingColours: List[Tag] =
     (Player.playerColours.keys.toSet -- PreGameManager.usedColours)
       .toList.sorted.map(colour => option(value := colour, colour))
 
+  /** HTML of the welcome page. */
   @cask.get("/")
   def hello(): cask.Response = {
 
@@ -67,9 +69,18 @@ object MenuRoutes extends cask.Routes {
     )
   }
 
+  /**
+    * Gives the remaining colours to the client.
+    * This is used when a player was trying to connect with an already used colour.
+    */
   @cask.get("/menus/colours")
   def returnColours(): String = remainingColours.map(_.render).mkString
 
+  /**
+    * Joins the game with the given name and colour, if still available.
+    *
+    * This should be a post as it has a side effect...
+    */
   @cask.get("/player-join-form/:playerName/:playerColour")
   def playerJoin(playerName: String, playerColour: String): cask.Response = {
     try {
@@ -92,6 +103,7 @@ object MenuRoutes extends cask.Routes {
     }
   }
 
+  /** Not sure whether I'm still using this... */
   @cask.get("/player-colours")
   def colours(): String = write(Player.playerColours, indent = 2)
 

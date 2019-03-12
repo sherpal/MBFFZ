@@ -2,6 +2,11 @@ package gamemanager
 
 import gamestate.actions.GameEnd
 
+/**
+  * Manages the state of the server.
+  * It is either playing, in which case it ignores any messages from the outside, and only manages
+  * the game, or it is not, in which case it waits for new players to come.
+  */
 object Manager {
 
   final val server: GameServer = new GameServer

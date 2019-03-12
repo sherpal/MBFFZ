@@ -9,7 +9,8 @@ import java.io._
 import scala.collection.mutable
 
 /**
-  * Starts the game.
+  * Starts the game loop and computes all the game computations.
+  *
   * @param playersInfo map from player names to their colours
   * @param passwords   map from player names to their password (/!\ it is not the same order as in
   *                    the [[PreGameManager]])

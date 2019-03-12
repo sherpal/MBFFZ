@@ -2,10 +2,15 @@ package gamemanager
 
 import entities.Player
 import gamemanager.exceptions._
+import utils.Constants
 
 import scala.collection.mutable
 import scala.util.Random
 
+/**
+  * Manages the communication with the players before they join the game (when they are still in
+  * the welcome screen)
+  */
 object PreGameManager {
 
   /** Map from player names to their colour. */
@@ -57,13 +62,13 @@ object PreGameManager {
 
         if (passwords.nonEmpty && isHead(plrName)) {
           Manager.server.sendTextToClient(
-            "you're the head",
+            Constants.youAreTheHead,
             Manager.server.getClient(passwords.head._1).get
           )
         } else {
           println("A player left.")
         }
-        Manager.server.broadcastText("player list update")
+        Manager.server.broadcastText(Constants.playerListUpdate)
       case None =>
     }
 
@@ -92,6 +97,7 @@ object PreGameManager {
 
   def isPlaying(password: String): Boolean = passwords.isDefinedAt(password)
 
+  /** Clears the game players info after the game. */
   def clear(): Unit = {
     _players.clear()
     passwords.clear()

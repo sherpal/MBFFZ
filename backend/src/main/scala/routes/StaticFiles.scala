@@ -1,7 +1,13 @@
 package routes
 
+/**
+  * These routes serve static files to the client, mainly the compiled js code.
+  */
 object StaticFiles extends cask.Routes {
 
+  /**
+    * Static files need to be stored in the resources of the backend, in the frontend folder.
+    */
   private val defaultPath: String = "backend/src/main/resources/frontend/"
 
   @cask.get("/app", subpath = true)

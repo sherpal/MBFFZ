@@ -62,21 +62,23 @@ object PreGame extends cask.Routes {
     cask.Response(htmlBody, headers = MBFFZ.noCache)
   }
 
+  /** Returns the map from player names to player colours. */
   @cask.get("/pre-game/players")
   def players(): String = write(PreGameManager.players)
 
+  /** Gets the player name associated to the password. */
   @cask.get("/pre-game/me/:password")
   def me(password: String): String = write(PreGameManager.playerName(password))
 
+  /** Why is this there? I think it's from the past. */
   @cask.get("/pre-game/display-players")
-  def displayPlayers(): String = write(PreGameManager.players.toList.toMap)
+  def displayPlayers(): String = write(PreGameManager.players)
 
+  /** Returns content needed to have the launch button. */
   @cask.get("/pre-game/launch-button")
-  def launchButton(): String = button(
-    id := "launch-game",
-    "Launch Game"
-  ).render
+  def launchButton(): String = button(id := "launch-game", "Launch Game").render
 
+  /** Launches the game, but only if the head requests it. */
   @cask.post("/pre-game/launch")
   def launchGame(request: cask.Request): cask.Response = {
     val password = new String(request.readAllBytes())

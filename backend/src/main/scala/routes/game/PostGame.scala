@@ -7,6 +7,7 @@ import utils.Constants
 
 object PostGame extends cask.Routes {
 
+  /** Displays the post game content if it exists. */
   @cask.get("/post-game")
   def scoreboard(): cask.Response = {
     Manager.postGameManager match {

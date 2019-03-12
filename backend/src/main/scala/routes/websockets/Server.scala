@@ -8,18 +8,30 @@ import messages.Message.Ping
 
 import scala.collection.mutable
 
+/**
+  * The [[Server]] is in charge of taking care of connected WebSocket clients.
+  *
+  * It has facility methods to send them messages, in [[Message]] or in String form.
+  *
+  * When a client connects, a connection callback is called, and it can take a parameter of type T.
+  *
+  * @tparam T type of the connection callback method.
+  */
 trait Server[T] extends AbstractReceiveListener {
 
+  /** We don't set callback to messages. */
   private val webSocketCallback: WebSocketCallback[Void] = new WebSocketCallback[Void] {
     override def complete(channel: WebSocketChannel, context: Void): Unit = {}
 
     override def onError(channel: WebSocketChannel, context: Void, throwable: Throwable): Unit = {}
   }
 
+  /** Remembers the list of connected [[Client]]s. */
   private val clients: mutable.Map[WebSocketChannel, Client] = mutable.Map()
 
   @inline protected def clientFromChannel(channel: WebSocketChannel): Client = clients(channel)
 
+  /** Remember time stamps at which players responded. It too long, we kill them. */
   private val lastMessageReceived: mutable.Map[Client, Long] = mutable.Map()
 
   def sendTextToClient(text: String, client: Client): Unit = {
@@ -82,6 +94,12 @@ trait Server[T] extends AbstractReceiveListener {
     lastMessageReceived += client -> new java.util.Date().getTime
 
 
+  /**
+    * Every 5 seconds, we kill every non-responding clients.
+    *
+    * We give them two chances to respond to our Ping message. It is your job to make the clients
+    * respond, and to call the `updateMessageReceived` method.
+    */
   private lazy val checkConnectionsThread: Thread = new Thread {
 
     override def run(): Unit = {

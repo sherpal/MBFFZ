@@ -6,6 +6,9 @@ import routes.menus.MenuRoutes
 import routes.websockets.WebSocketRoute
 import utils.Constants
 
+/**
+  * Main object that contains all the routes for the cask server.
+  */
 object MBFFZ extends cask.Main(
   MenuRoutes,
   PreGame,
@@ -18,6 +21,9 @@ object MBFFZ extends cask.Main(
 
   override def port: Int = Constants.port
 
+  /**
+    * Holds the necessary information to prevent browsers from caching.
+    */
   val noCache: Seq[(String, String)] = Seq(
     "Cache-Control" -> "no-cache, no-store, must-revalidate",
     "Pragma" -> "no-cache",
@@ -27,7 +33,7 @@ object MBFFZ extends cask.Main(
   override def main(args: Array[String]): Unit = {
     super.main(args)
 
-    println(s"Server started on $host:$port")
+    println(s"Server started on $host:$port") // print server info
   }
 
 }
